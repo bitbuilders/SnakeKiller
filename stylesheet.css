@@ -1,0 +1,44 @@
+canvas {
+    padding: 0;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    border: 3px;
+    border-style: solid;
+    border-color: #00395a;
+    border-radius: 6px;
+    background-color: #ffffff;
+}
+
+body {
+    font-family: Bungee, "Arial";
+    align-content: center;
+    background-color: #0074bb;
+    color: #4db6ee;
+}
+
+p {
+    font-family: Roboto, "Arial";
+}
+
+#title {
+    text-align: center;
+    text-shadow: 2px 2px #00395a;
+}
+
+.info {
+    font-family: Roboto, "Arial";
+    width: 40%;
+    margin-left: 25px;
+    margin-top: 50px;
+    padding: 0;
+}
+
+.textAlign {
+    text-align: center;
+    margin-right: 20px;
+}
+
+.infoText {
+    margin-top: 0px;
+}
