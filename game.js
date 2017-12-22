@@ -21,7 +21,7 @@ var snakeY = 5;
 var snakePrevX = 0;
 var snakePrevY = 0;
 var snakeCurrTime = 0;
-var snakeGrowthTime = 10;
+var snakeGrowthTime = 15;
 var snakeGrowthCurrentTime = 0;
 var snakeDirChange = 3; // millis, but will change every time
 var snakeDirPossibilities = ["left", "up", "right", "down"];
@@ -75,7 +75,7 @@ var gunUDown = false;
 var gunRDown = false;
 var gunDDown = false;
 
-var playerSpeed = 100; // millis
+var playerSpeed = 150; // millis
 
 function gameLoop()
 {
@@ -91,8 +91,10 @@ function update()
         fireBullet();
     }
     if (!inSnakeAnimation) {
-         moveSnake();
-         growSnake();
+        moveSnake();
+        preUpdateSnakeBody();
+        growSnake();
+        updateSnakeBody();
     }
 }
 
@@ -118,7 +120,6 @@ function render() {
     if (snakePrevX == x && snakePrevY == y && !inSnakeAnimation)
     {
         drawSnake();
-        console.log("hi");
     }
 }
 
@@ -143,6 +144,83 @@ function animate() {
     if (snakePrevY - snakeY != 0) {
         animateSnake(true, snakePrevY - snakeY);
     }
+
+    if (snakePrevX - snakeX != 0 || snakePrevY - snakeY != 0) {
+        drawSnakeBody();
+    }
+}
+
+function preUpdateSnakeBody() {
+
+    // for (var i = snakeBody.length - 1; i > 0; --i) {
+    //     var currSnake = snakeBody[i];
+        
+    //     currSnake.prevX = currSnake.x;
+    //     currSnake.prevY = currSnake.y;
+    // }
+}
+
+function updateSnakeBody() {
+    if (snakeBody.length > 0) {
+        snakeBody[0].prevX = snakeBody[0].x;
+        snakeBody[0].prevY = snakeBody[0].y;
+
+        snakeBody[0].x = snakePrevX;
+        snakeBody[0].y = snakePrevY;
+    }
+
+    for (var i = 1; i < snakeBody.length - 1; ++i) {
+        var newX = snakeBody[i - 1].prevX;
+        var newY = snakeBody[i - 1].prevY;
+    
+        snakeBody[i].prevX = snakeBody[i].x;
+        snakeBody[i].prevY = snakeBody[i].y;
+    
+        snakeBody[i].x = newX;
+        snakeBody[i].y = newY;
+    }
+    //console.log(snakeBody);
+}
+
+var bodyTime = 0;
+
+function drawSnakeBody() {
+    bodyTime += 10;
+
+    for (var i = 0; i < snakeBody.length; ++i) {
+        var currSnake = snakeBody[i];
+
+        var distX = currSnake.prevX - currSnake.x;
+        var distY = currSnake.prevY - currSnake.y;
+        if (currSnake.x - currSnake.prevX != 0 && (distX < 5 && distX > -5)) {
+            animateIndividualPartHoriz(currSnake.prevX, currSnake.prevY, distX, bodyTime);
+        }
+        if (currSnake.y - currSnake.prevY != 0 && (distY < 5 && distY > -5)) {
+            animateIndividualPartVert(currSnake.prevX, currSnake.prevY, distY, bodyTime);
+        }
+    }
+
+    if (bodyTime >= playerSpeed) {
+        bodyTime = 0;
+    }
+}
+
+function animateIndividualPartVert(oldX, oldY, distance, time)
+{
+    var pos = distance * (time / playerSpeed);
+    var dist = pos * tileSize;
+    
+    ctx.fillStyle = "rgb(0, 200, 50)";
+    ctx.fillRect(oldX * tileSize, oldY * tileSize - dist, tileSize, tileSize);
+}
+
+function animateIndividualPartHoriz(oldX, oldY, distance, time)
+{
+    var pos = distance * (time / playerSpeed);
+    var dist = pos * tileSize;
+    
+    ctx.fillStyle = "rgb(0, 200, 50)";
+    ctx.fillRect(oldX * tileSize - dist, oldY * tileSize, tileSize, tileSize);
 }
 
 function clearCanvas()
@@ -223,8 +301,9 @@ function growSnake() {
     if (snakeGrowthCurrentTime >= snakeGrowthTime) {
         snakeGrowthCurrentTime = 0;
 
-        var i = snakeBody.push({x: snakeX, y:snakeY});
-        console.log(snakeBody[snakeBody.length - 1].x);
+        var i = snakeBody.push({x: snakePrevX, y:snakePrevY,prevX: snakePrevX, prevY: snakePrevY});
+
+        console.log(snakeBody[snakeBody.length - 1].x, snakeBody.length);
     }
 }
 
@@ -252,6 +331,7 @@ function moveSnakeLeft() {
     
     if (snakeX < 0) {
         snakeX = tilesHorizontal - 1;
+        snakePrevX = tilesHorizontal;
     }
 }
 
@@ -260,6 +340,7 @@ function moveSnakeRight() {
     
     if (snakeX > tilesHorizontal - 1) {
         snakeX = 0;
+        snakePrevX = -1;
     }
 }
 
@@ -268,6 +349,7 @@ function moveSnakeUp() {
     
     if (snakeY < 0) {
         snakeY = tilesVertical - 1;
+        snakePrevY = tilesVertical;
     }
 }
 
@@ -276,6 +358,7 @@ function moveSnakeDown() {
     
     if (snakeY > tilesVertical - 1) {
         snakeY = 0;
+        snakePrevY = -1;
     }
 }
 
@@ -393,18 +476,22 @@ function checkPosition()
     if (x > tilesHorizontal - 1)
     {
         x = 0;
+        prevX = -1;
     }
     else if (x < 0)
     {
         x = tilesHorizontal - 1;
+        prevX = tilesHorizontal;
     }
     if (y > tilesVertical - 1)
     {
         y = 0;
+        prevY = -1;
     }
     else if (y < 0)
     {
         y = tilesVertical - 1;
+        prevY = tilesVertical;
     }
 }
 
@@ -421,42 +508,26 @@ var horizTimer;
 function animatePlayer(vertical, distance)
 {
     if (vertical) {
-        if (distance != 0 && (distance < 8 || distance < -8)) {
+        if (distance != 0) {
             animateVertically(distance);
-        }
-        if (distance >= 8 || distance <= -8)
-        {
-            inPlayerAnimation = false;
         }
     }
     else {
-        if (distance != 0 && (distance < 8 || distance < -8)) {
+        if (distance != 0) {
             animateHorizontally(distance);
-        }
-        if (distance >= 8 || distance <= -8)
-        {
-            inPlayerAnimation = false;
         }
     }
 }
 
 function animateSnake(vert, distance) {
     if (vert) {
-        if (distance != 0 && (distance < 8 || distance < -8)) {
+        if (distance != 0) {
             animateSnakeVert(distance);
-        }
-        if (distance >= 8 || distance <= -8)
-        {
-            inSnakeAnimation = false;
         }
     }
     else {
-        if (distance != 0 && (distance < 8 || distance < -8)) {
+        if (distance != 0) {
             animateSnakeHoriz(distance);
-        }
-        if (distance >= 8 || distance <= -8)
-        {
-            inSnakeAnimation = false;
         }
     }
 }
@@ -489,7 +560,7 @@ function animateSnakeVert(distance)
     var pos = distance * (snakeTime / playerSpeed);
     var dist = pos * tileSize;
 
-    ctx.fillStyle = "rgb(0, 200, 50)";
+    ctx.fillStyle = "rgb(0, 150, 50)";
     ctx.fillRect(snakePrevX * tileSize, snakePrevY * tileSize - dist, tileSize, tileSize);
     
     if ((distance > 0 && pos >= distance) || (distance < 0 && pos <= distance))
@@ -521,7 +592,7 @@ function animateSnakeHoriz(distance)
     var pos = distance * (snakeTime / playerSpeed);
     var dist = pos * tileSize;
     
-    ctx.fillStyle = "rgb(0, 200, 50)";
+    ctx.fillStyle = "rgb(0, 150, 50)";
     ctx.fillRect(snakePrevX * tileSize - dist, snakePrevY * tileSize, tileSize, tileSize);
     
     if ((distance > 0 && pos >= distance) || (distance < 0 && pos <= distance))
@@ -552,12 +623,12 @@ function drawPlayer() {
 }
 
 function drawSnake() {
-    ctx.fillStyle = "rgb(0, 200, 50)";
+    ctx.fillStyle = "rgb(0, 120, 50)";
     ctx.fillRect(snakeX * tileSize, snakeY * tileSize, tileSize, tileSize);
 }
 
 function drawPreviousSnake() {
-    ctx.fillStyle = "rgb(0, 200, 50)";
+    ctx.fillStyle = "rgb(0, 120, 50)";
     ctx.fillRect(snakePrevX * tileSize, snakePrevY * tileSize, tileSize, tileSize);
 }
 
