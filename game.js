@@ -165,8 +165,26 @@ function updateSnakeBody() {
         snakeBody[0].prevX = snakeBody[0].x;
         snakeBody[0].prevY = snakeBody[0].y;
 
-        snakeBody[0].x = snakePrevX;
-        snakeBody[0].y = snakePrevY;
+        if (snakePrevX > tilesHorizontal - 1) {
+            snakeBody[0].x = 0;
+        }
+        else if (snakePrevX < 0) {
+            snakeBody[0].x = tilesHorizontal - 1;
+        }
+        else {
+            snakeBody[0].x = snakePrevX;
+        }
+        if (snakePrevY > tilesVertical - 1) {
+            snakeBody[0].y = 0;
+        }
+        else if (snakePrevY < 0) {
+            snakeBody[0].y = tilesVertical - 1;
+        }
+        else {
+            snakeBody[0].y = snakePrevY;
+        }
+        // snakeBody[0].x = snakePrevX;
+        // snakeBody[0].y = snakePrevY;
     }
 
     for (var i = 1; i < snakeBody.length - 1; ++i) {
@@ -183,6 +201,7 @@ function updateSnakeBody() {
 }
 
 var bodyTime = 0;
+var travelLimit = 2;
 
 function drawSnakeBody() {
     bodyTime += 10;
@@ -192,14 +211,14 @@ function drawSnakeBody() {
 
         var distX = currSnake.prevX - currSnake.x;
         var distY = currSnake.prevY - currSnake.y;
-        if (currSnake.x - currSnake.prevX != 0 && (distX < 5 && distX > -5)) {
+        if (currSnake.x - currSnake.prevX != 0 && (distX < travelLimit && distX > -travelLimit)) {
             animateIndividualPartHoriz(currSnake.prevX, currSnake.prevY, distX, bodyTime);
         }
-        if (currSnake.y - currSnake.prevY != 0 && (distY < 5 && distY > -5)) {
+        if (currSnake.y - currSnake.prevY != 0 && (distY < travelLimit && distY > -travelLimit)) {
             animateIndividualPartVert(currSnake.prevX, currSnake.prevY, distY, bodyTime);
         }
     }
-
+        
     if (bodyTime >= playerSpeed) {
         bodyTime = 0;
     }
@@ -623,12 +642,12 @@ function drawPlayer() {
 }
 
 function drawSnake() {
-    ctx.fillStyle = "rgb(0, 120, 50)";
+    ctx.fillStyle = "rgb(0, 150, 50)";
     ctx.fillRect(snakeX * tileSize, snakeY * tileSize, tileSize, tileSize);
 }
 
 function drawPreviousSnake() {
-    ctx.fillStyle = "rgb(0, 120, 50)";
+    ctx.fillStyle = "rgb(0, 150, 50)";
     ctx.fillRect(snakePrevX * tileSize, snakePrevY * tileSize, tileSize, tileSize);
 }
 
