@@ -167,55 +167,32 @@ function updateSnakeBody() {
         snakeBody[0].prevX = snakeBody[0].x;
         snakeBody[0].prevY = snakeBody[0].y;
 
-        if (snakePrevX > tilesHorizontal - 1) {
-            snakeBody[0].x = 0;
-        }
-        else if (snakePrevX < 0) {
-            snakeBody[0].x = tilesHorizontal - 1;
-        }
-        else {
-            snakeBody[0].x = snakePrevX;
-        }
-        if (snakePrevY > tilesVertical - 1) {
-            snakeBody[0].y = 0;
-        }
-        else if (snakePrevY < 0) {
-            snakeBody[0].y = tilesVertical - 1;
-        }
-        else {
-            snakeBody[0].y = snakePrevY;
-        }
-        // snakeBody[0].x = snakePrevX;
-        // snakeBody[0].y = snakePrevY;
+        // if (snakePrevX > tilesHorizontal - 1) {
+        //     snakeBody[0].x = 0;
+        // }
+        // else if (snakePrevX < 0) {
+        //     snakeBody[0].x = tilesHorizontal - 1;
+        // }
+        // else {
+        //     snakeBody[0].x = snakePrevX;
+        // }
+        // if (snakePrevY > tilesVertical - 1) {
+        //     snakeBody[0].y = 0;
+        // }
+        // else if (snakePrevY < 0) {
+        //     snakeBody[0].y = tilesVertical - 1;
+        // }
+        // else {
+        //     snakeBody[0].y = snakePrevY;
+        // }
+        snakeBody[0].x = snakePrevX;
+        snakeBody[0].y = snakePrevY;
     }
 
     for (var i = 1; i < snakeBody.length - 1; ++i) {
         var newX = snakeBody[i - 1].prevX;
         var newY = snakeBody[i - 1].prevY;
 
-        // if (newX - snakeBody[i].x > 5 || newX - snakeBody[i].x < -5) {
-        //     if (newX - snakeBody[i - 1].x < 0) {
-        //         snakeBody[i].prevX = tilesHorizontal;
-        //     }
-        //     else {
-        //         snakeBody[i].prevX = -1;
-        //     }
-        // }
-        // else {
-        //     snakeBody[i].prevX = snakeBody[i].x;
-        // }
-        // if (newY - snakeBody[i].y > 5 || newY - snakeBody[i].y < -5) {
-        //     if (newY - snakeBody[i - 1].y < 0) {
-        //         snakeBody[i].prevY = tilesVertical;
-        //     }
-        //     else {
-        //         snakeBody[i].prevY = -1;
-        //     }
-        // }
-        // else {
-        //     snakeBody[i].prevY = snakeBody[i].y;
-
-        // }
         snakeBody[i].prevX = snakeBody[i].x;
         snakeBody[i].prevY = snakeBody[i].y;
     
@@ -348,13 +325,25 @@ function growSnake() {
     if (snakeGrowthCurrentTime >= snakeGrowthTime) {
         snakeGrowthCurrentTime = 0;
 
-        var i = snakeBody.push({x: snakePrevX, y:snakePrevY,prevX: snakePrevX, prevY: snakePrevY,
-            color:snakeColors[snakeColorIndex++]});
+        var X;
+        var Y;
+
+        if (snakeBody.length > 0) {
+            X = snakeBody[snakeBody.length - 1].x;
+            Y = snakeBody[snakeBody.length - 1].y;
+        }
+        else {
+            X = snakePrevX;
+            Y = snakePrevY;
+        }
+
+        var i = snakeBody.push({x: X, y: Y,prevX: X, prevY: Y, color:snakeColors[snakeColorIndex++]});
+
         if (snakeColorIndex >= snakeColors.length) {
             snakeColorIndex = 0;
         }
 
-        console.log(snakeBody[snakeBody.length - 1].x, snakeBody.length);
+        //console.log(snakeBody[snakeBody.length - 1].x, snakeBody.length);
     }
 }
 
@@ -592,7 +581,7 @@ function animateVertically(distance)
     var pos = distance * (time / playerSpeed);
     var dist = pos * tileSize;
     
-    ctx.fillStyle = "rgb(100, 50, 200)";
+    ctx.fillStyle = "rgb(255, 255, 255)";
     ctx.fillRect(prevX * tileSize, prevY * tileSize - dist, tileSize, tileSize);
     //ctx.drawImage(shield, mouseX, mouseY);
     
@@ -627,7 +616,7 @@ function animateHorizontally(distance, snakeDistance)
     var pos = distance * (time / playerSpeed);
     var dist = pos * tileSize;
 
-    ctx.fillStyle = "rgb(100, 50, 200)";
+    ctx.fillStyle = "rgb(255, 255, 255)";
     ctx.fillRect(prevX * tileSize - dist, prevY * tileSize, tileSize, tileSize);
     
     if ((distance > 0 && pos >= distance) || (distance < 0 && pos <= distance))
@@ -669,7 +658,7 @@ function resetSnakeAnimation(vert)
 }
 
 function drawPlayer() {
-    ctx.fillStyle = "rgb(100, 50, 200)";
+    ctx.fillStyle = "rgb(255, 255, 255)";
     ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
 }
 
@@ -709,6 +698,6 @@ function drawLine(x1, y1, x2, y2) {
 
 function drawPreviousPlayer()
 {
-    ctx.fillStyle = "rgb(100, 50, 200)";
+    ctx.fillStyle = "rgb(255, 255, 255)";
     ctx.fillRect(prevX * tileSize, prevY * tileSize, tileSize, tileSize);
 }
