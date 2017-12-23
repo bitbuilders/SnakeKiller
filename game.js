@@ -25,6 +25,8 @@ var snakeGrowthTime = 15;
 var snakeGrowthCurrentTime = 0;
 var snakeDirChange = 3; // millis, but will change every time
 var snakeDirPossibilities = ["left", "up", "right", "down"];
+var snakeColorIndex = 0;
+var snakeColors = ["#bd2424","#dda52b","#eef12e","#35cc35","#2867c7","#9035b4","#cb54d6",];
 var snakeCurrentDir = "left";
 var snakeBody = [];
 
@@ -190,7 +192,30 @@ function updateSnakeBody() {
     for (var i = 1; i < snakeBody.length - 1; ++i) {
         var newX = snakeBody[i - 1].prevX;
         var newY = snakeBody[i - 1].prevY;
-    
+
+        // if (newX - snakeBody[i].x > 5 || newX - snakeBody[i].x < -5) {
+        //     if (newX - snakeBody[i - 1].x < 0) {
+        //         snakeBody[i].prevX = tilesHorizontal;
+        //     }
+        //     else {
+        //         snakeBody[i].prevX = -1;
+        //     }
+        // }
+        // else {
+        //     snakeBody[i].prevX = snakeBody[i].x;
+        // }
+        // if (newY - snakeBody[i].y > 5 || newY - snakeBody[i].y < -5) {
+        //     if (newY - snakeBody[i - 1].y < 0) {
+        //         snakeBody[i].prevY = tilesVertical;
+        //     }
+        //     else {
+        //         snakeBody[i].prevY = -1;
+        //     }
+        // }
+        // else {
+        //     snakeBody[i].prevY = snakeBody[i].y;
+
+        // }
         snakeBody[i].prevX = snakeBody[i].x;
         snakeBody[i].prevY = snakeBody[i].y;
     
@@ -212,10 +237,10 @@ function drawSnakeBody() {
         var distX = currSnake.prevX - currSnake.x;
         var distY = currSnake.prevY - currSnake.y;
         if (currSnake.x - currSnake.prevX != 0 && (distX < travelLimit && distX > -travelLimit)) {
-            animateIndividualPartHoriz(currSnake.prevX, currSnake.prevY, distX, bodyTime);
+            animateIndividualPartHoriz(currSnake.prevX, currSnake.prevY, distX, bodyTime, currSnake.color);
         }
         if (currSnake.y - currSnake.prevY != 0 && (distY < travelLimit && distY > -travelLimit)) {
-            animateIndividualPartVert(currSnake.prevX, currSnake.prevY, distY, bodyTime);
+            animateIndividualPartVert(currSnake.prevX, currSnake.prevY, distY, bodyTime, currSnake.color);
         }
     }
         
@@ -224,21 +249,23 @@ function drawSnakeBody() {
     }
 }
 
-function animateIndividualPartVert(oldX, oldY, distance, time)
+function animateIndividualPartVert(oldX, oldY, distance, time, color)
 {
     var pos = distance * (time / playerSpeed);
     var dist = pos * tileSize;
     
-    ctx.fillStyle = "rgb(0, 200, 50)";
+    //ctx.fillStyle = "rgb(0, 200, 50)";
+    ctx.fillStyle = color;
     ctx.fillRect(oldX * tileSize, oldY * tileSize - dist, tileSize, tileSize);
 }
 
-function animateIndividualPartHoriz(oldX, oldY, distance, time)
+function animateIndividualPartHoriz(oldX, oldY, distance, time, color)
 {
     var pos = distance * (time / playerSpeed);
     var dist = pos * tileSize;
     
-    ctx.fillStyle = "rgb(0, 200, 50)";
+    //ctx.fillStyle = "rgb(0, 200, 50)";
+    ctx.fillStyle = color;
     ctx.fillRect(oldX * tileSize - dist, oldY * tileSize, tileSize, tileSize);
 }
 
@@ -291,6 +318,7 @@ function moveSnake() {
         }
         
         snakeCurrentDir = dir;
+        //snakeCurrentDir = "left";
 
         snakeDirChange = Math.floor(Math.random() * 4) + 1;
     }
@@ -320,7 +348,11 @@ function growSnake() {
     if (snakeGrowthCurrentTime >= snakeGrowthTime) {
         snakeGrowthCurrentTime = 0;
 
-        var i = snakeBody.push({x: snakePrevX, y:snakePrevY,prevX: snakePrevX, prevY: snakePrevY});
+        var i = snakeBody.push({x: snakePrevX, y:snakePrevY,prevX: snakePrevX, prevY: snakePrevY,
+            color:snakeColors[snakeColorIndex++]});
+        if (snakeColorIndex >= snakeColors.length) {
+            snakeColorIndex = 0;
+        }
 
         console.log(snakeBody[snakeBody.length - 1].x, snakeBody.length);
     }
